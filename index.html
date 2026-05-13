@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ultra Premium Dashboard</title>
+    
+    <!-- Chart.js va Google Fonts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #22d3ee;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* KIRISH ANIMATSIYASI */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; /* Mobil teginishni chiroyli qilish */
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: white;
+            padding: 15px;
+        }
+
+        .dashboard {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 30px;
+            width: 100%;
+            max-width: 950px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            animation: slideUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* MOBIL REJIM (768px dan kichik bo'lsa) */
+        @media (max-width: 850px) {
+            .dashboard { 
+                grid-template-columns: 1fr; 
+                padding: 25px 20px;
+                border-radius: 30px;
+                margin-top: 20px;
+            }
+            h2 { font-size: 1.5rem !important; }
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #818cf8, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 25px 0;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        /* INPUTLAR VA TUGMALAR */
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+
+        .field { display: flex; flex-direction: column; gap: 8px; }
+
+        label { color: #94a3b8; font-size: 0.8rem; padding-left: 5px; }
+
+        input, select {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.95rem;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            grid-column: span 2;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-alt {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 1px solid var(--border);
+        }
+
+        button:hover { transform: scale(1.02); filter: brightness(1.2); }
+        button:active { transform: scale(0.97); }
+
+        /* JADVAL */
+        .stats-list { margin-top: 20px; display: grid; gap: 10px; }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- VIZUAL QISM -->
+        <div class="visual-section">
+            <h2>Moliya Markazi</h2>
+            <div class="chart-container">
+                <canvas id="ultraChart"></canvas>
+            </div>
+            
+            <div class="stats-list" id="statsList">
+                <!-- Statlar shu yerda -->
+            </div>
+        </div>
+
+        <!-- BOSHQARUV QISMI -->
+        <div class="input-section">
+            <div style="background: rgba(0,0,0,0.2); padding: 25px; border-radius: 30px; border: 1px solid var(--border);">
+                <h3 style="margin-top:0; color:#fff; font-size:1.2rem;">Boshqaruv</h3>
+                
+                <div class="controls">
+                    <div class="field">
+                        <label>SUMMA ($)</label>
+                        <input type="number" id="val" placeholder="0.00" inputmode="decimal">
+                    </div>
+                    
+                    <div class="field">
+                        <label>KATEGORIYA</label>
+                        <select id="cat">
+                            <option value="0">Investitsiya 📈</option>
+                            <option value="1">Sayohat 🏝️</option>
+                            <option value="2">Ta'lim 🎓</option>
+                            <option value="3">Sog'liq 🍏</option>
+                            <option value="4">Zaxira 🏦</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-main" onclick="updateData()">Yangilash</button>
+                    
+                    <div class="btn-group">
+                        <button class="btn-alt" onclick="randomize()">🎲 Mix</button>
+                        <button class="btn-alt" onclick="resetData()">🧹 Tozalash</button>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="text-align:center; font-size:0.7rem; color:#475569; margin-top:20px;">
+                © 2026 Mobile Finance Dashboard v2.0
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('ultraChart').getContext('2d');
+        
+        let myData = [4500, 2800, 1500, 1000, 3200];
+        const labels = ['Investitsiya', 'Sayohat', 'Ta\'lim', 'Sog\'liq', 'Zaxira'];
+        const colors = ['#6366f1', '#a855f7', '#22d3ee', '#10b981', '#f59e0b'];
+
+        // GRAFIKNI SOZLASH
+        let ultraChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: myData,
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    hoverOffset: 25,
+                    borderRadius: 15,
+                    spacing: 8
+                }]
+            },
+            options: {
+                cutout: '72%',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                animation: { duration: 2000, easing: 'easeOutQuart' }
+            }
+        });
+
+        // JADVALNI CHIZISH
+        function renderTable() {
+            const container = document.getElementById('statsList');
+            container.innerHTML = '';
+            myData.forEach((val, i) => {
+                container.innerHTML += `
+                    <div class="stat-item" style="border-left-color: ${colors[i]}">
+                        <span style="font-weight:600">${labels[i]}</span>
+                        <span style="color:#22d3ee">$${val.toLocaleString()}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // FUNKSIYALAR
+        function updateData() {
+            const v = document.getElementById('val').value;
+            const i = document.getElementById('cat').value;
+            if(v && v >= 0) {
+                myData[i] = parseFloat(v);
+                ultraChart.update();
+                renderTable();
+                document.getElementById('val').value = '';
+            }
+        }
+
+        function randomize() {
+            myData = myData.map(() => Math.floor(Math.random() * 5000) + 500);
+            ultraChart.data.datasets[0].data = myData;
+            ultraChart.update();
+            renderTable();
+        }
+
+        function resetData() {
+            myData = [0, 0, 0, 0, 0];
+            ultraChart.data.datasets[0].data = myData;
+            ultraChart.update();
+            renderTable();
+        }
+
+        // Boshlanishida jadvalni yuklash
+        renderTable();
+    </script>
+</body>
+</html>

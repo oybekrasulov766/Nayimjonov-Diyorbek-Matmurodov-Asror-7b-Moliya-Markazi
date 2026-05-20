@@ -19,28 +19,27 @@
             --border: rgba(255, 255, 255, 0.1);
         }
 
-        /* KIRISH ANIMATSIYASI */
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
         * { 
             box-sizing: border-box; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent; /* Mobil teginishni chiroyli qilish */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background: var(--bg);
-            background-image: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 100%);
+            background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Mobil uchun yuqoridan boshlash */
             margin: 0;
             color: white;
-            padding: 15px;
+            padding: 10px;
         }
 
         .dashboard {
@@ -48,26 +47,30 @@
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 30px;
+            border-radius: 35px;
+            padding: 25px;
             width: 100%;
             max-width: 950px;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
-            gap: 30px;
+            gap: 25px;
             box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-            animation: slideUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            margin-top: 10px;
         }
 
-        /* MOBIL REJIM (768px dan kichik bo'lsa) */
+        /* MOBIL OPTIMIZATSIYA */
         @media (max-width: 850px) {
+            body { padding: 10px; align-items: stretch; }
             .dashboard { 
                 grid-template-columns: 1fr; 
-                padding: 25px 20px;
+                padding: 20px;
+                gap: 20px;
                 border-radius: 30px;
-                margin-top: 20px;
             }
-            h2 { font-size: 1.5rem !important; }
+            h2 { font-size: 1.6rem !important; }
+            .chart-container { padding: 15px; }
+            input, select, button { font-size: 16px !important; } /* iOS zoom oldini olish uchun */
         }
 
         h2 {
@@ -76,7 +79,7 @@
             background: linear-gradient(to right, #818cf8, #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0 0 25px 0;
+            margin: 0 0 20px 0;
             text-align: center;
         }
 
@@ -84,56 +87,58 @@
             position: relative;
             background: rgba(0,0,0,0.2);
             padding: 20px;
-            border-radius: 30px;
+            border-radius: 25px;
             border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ultraChart {
+            max-width: 100% !important;
+            height: auto !important;
         }
 
         /* INPUTLAR VA TUGMALAR */
         .controls { display: flex; flex-direction: column; gap: 15px; }
-
-        .field { display: flex; flex-direction: column; gap: 8px; }
-
-        label { color: #94a3b8; font-size: 0.8rem; padding-left: 5px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        label { color: #94a3b8; font-size: 0.75rem; font-weight: 600; padding-left: 5px; }
 
         input, select {
             width: 100%;
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
+            padding: 14px;
+            background: rgba(255,255,255,0.07);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 15px;
             color: white;
-            font-size: 1rem;
             outline: none;
             transition: 0.3s;
+            appearance: none; /* Select o'qi uchun */
         }
 
-        input:focus {
-            border-color: var(--accent);
-            background: rgba(255,255,255,0.1);
-        }
+        input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); }
 
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 5px;
+            gap: 10px;
         }
 
         button {
             padding: 16px;
             border: none;
-            border-radius: 18px;
+            border-radius: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 0.95rem;
+            transition: all 0.2s ease;
         }
 
         .btn-main {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             grid-column: span 2;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            margin-bottom: 5px;
         }
 
         .btn-alt {
@@ -142,21 +147,28 @@
             border: 1px solid var(--border);
         }
 
-        button:hover { transform: scale(1.02); filter: brightness(1.2); }
-        button:active { transform: scale(0.97); }
+        button:active { transform: scale(0.96); opacity: 0.9; }
 
-        /* JADVAL */
-        .stats-list { margin-top: 20px; display: grid; gap: 10px; }
+        /* STATISTIKA RO'YXATI */
+        .stats-list { 
+            margin-top: 20px; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 10px; 
+        }
 
         .stat-item {
             display: flex;
-            justify-content: space-between;
-            padding: 14px 20px;
-            background: rgba(255,255,255,0.02);
+            flex-direction: column;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.03);
             border-radius: 15px;
-            border-left: 4px solid var(--primary);
-            font-size: 0.9rem;
+            border-left: 3px solid var(--primary);
         }
+
+        .stat-label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
+        .stat-value { font-size: 1rem; font-weight: 700; color: var(--accent); }
+
     </style>
 </head>
 <body>
@@ -170,23 +182,23 @@
             </div>
             
             <div class="stats-list" id="statsList">
-                <!-- Statlar shu yerda -->
+                <!-- Statlar shu yerda chiqadi -->
             </div>
         </div>
 
         <!-- BOSHQARUV QISMI -->
         <div class="input-section">
-            <div style="background: rgba(0,0,0,0.2); padding: 25px; border-radius: 30px; border: 1px solid var(--border);">
-                <h3 style="margin-top:0; color:#fff; font-size:1.2rem;">Boshqaruv</h3>
+            <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 25px; border: 1px solid var(--border);">
+                <h3 style="margin: 0 0 15px 0; color:#fff; font-size:1.1rem; text-align: center;">Boshqaruv paneli</h3>
                 
                 <div class="controls">
                     <div class="field">
                         <label>SUMMA ($)</label>
-                        <input type="number" id="val" placeholder="0.00" inputmode="decimal">
+                        <input type="number" id="val" placeholder="Masalan: 2500" inputmode="decimal">
                     </div>
                     
                     <div class="field">
-                        <label>KATEGORIYA</label>
+                        <label>KATEGORIYA Tanlang</label>
                         <select id="cat">
                             <option value="0">Investitsiya 📈</option>
                             <option value="1">Sayohat 🏝️</option>
@@ -196,17 +208,17 @@
                         </select>
                     </div>
 
-                    <button class="btn-main" onclick="updateData()">Yangilash</button>
+                    <button class="btn-main" onclick="updateData()">Ma'lumotni Yangilash</button>
                     
                     <div class="btn-group">
-                        <button class="btn-alt" onclick="randomize()">🎲 Mix</button>
+                        <button class="btn-alt" onclick="randomize()">🎲 Tasodifiy</button>
                         <button class="btn-alt" onclick="resetData()">🧹 Tozalash</button>
                     </div>
                 </div>
             </div>
             
-            <p style="text-align:center; font-size:0.7rem; color:#475569; margin-top:20px;">
-                © 2026 Mobile Finance Dashboard v2.0
+            <p style="text-align:center; font-size:0.65rem; color:#475569; margin-top:15px; letter-spacing: 1px;">
+                © 2026 PREMIUM DASHBOARD V2.1
             </p>
         </div>
     </div>
@@ -218,7 +230,6 @@
         const labels = ['Investitsiya', 'Sayohat', 'Ta\'lim', 'Sog\'liq', 'Zaxira'];
         const colors = ['#6366f1', '#a855f7', '#22d3ee', '#10b981', '#f59e0b'];
 
-        // GRAFIKNI SOZLASH
         let ultraChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -227,48 +238,49 @@
                     data: myData,
                     backgroundColor: colors,
                     borderWidth: 0,
-                    hoverOffset: 25,
-                    borderRadius: 15,
-                    spacing: 8
+                    hoverOffset: 20,
+                    borderRadius: 12,
+                    spacing: 5
                 }]
             },
             options: {
-                cutout: '72%',
+                cutout: '75%',
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: { legend: { display: false } },
-                animation: { duration: 2000, easing: 'easeOutQuart' }
+                animation: { duration: 1500, easing: 'easeOutExpo' }
             }
         });
 
-        // JADVALNI CHIZISH
         function renderTable() {
             const container = document.getElementById('statsList');
             container.innerHTML = '';
             myData.forEach((val, i) => {
                 container.innerHTML += `
                     <div class="stat-item" style="border-left-color: ${colors[i]}">
-                        <span style="font-weight:600">${labels[i]}</span>
-                        <span style="color:#22d3ee">$${val.toLocaleString()}</span>
+                        <span class="stat-label">${labels[i]}</span>
+                        <span class="stat-value">$${val.toLocaleString()}</span>
                     </div>
                 `;
             });
         }
 
-        // FUNKSIYALAR
         function updateData() {
             const v = document.getElementById('val').value;
             const i = document.getElementById('cat').value;
             if(v && v >= 0) {
                 myData[i] = parseFloat(v);
+                ultraChart.data.datasets[0].data = myData;
                 ultraChart.update();
                 renderTable();
                 document.getElementById('val').value = '';
+                // Mobil klaviaturani yopish
+                document.activeElement.blur();
             }
         }
 
         function randomize() {
-            myData = myData.map(() => Math.floor(Math.random() * 5000) + 500);
+            myData = myData.map(() => Math.floor(Math.random() * 8000) + 500);
             ultraChart.data.datasets[0].data = myData;
             ultraChart.update();
             renderTable();
@@ -281,7 +293,6 @@
             renderTable();
         }
 
-        // Boshlanishida jadvalni yuklash
         renderTable();
     </script>
 </body>
